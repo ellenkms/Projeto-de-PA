@@ -4,4 +4,4 @@ Aplicação de desenho estilo Google Drawings desenvolvida em Python com a bibli
 
 ## Equipe
 - Ricardo Silva Machado
-- Ellen Karoline
+- Ellen Karoline Mendonça Santos
