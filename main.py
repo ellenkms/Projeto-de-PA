@@ -38,6 +38,8 @@ def desenhar_figuras():
             canvas.create_line(values[0], values[1], values[2], values[3])
         elif fig == "Retângulo":
             canvas.create_rectangle(values[0], values[1], values[2], values[3])
+        elif fig == "Oval":
+            canvas.create_oval(values[0], values[1], values[2], values[3])
         else: # fig == "Rabisco"
             canvas.create_line(values)
 
@@ -48,6 +50,8 @@ def desenhar_figura_nova():
             canvas.create_line(values[0], values[1], values[2], values[3], dash=(4, 2))
         elif fig == "Retângulo":
             canvas.create_rectangle(values[0], values[1], values[2], values[3], dash=(4, 2))
+        elif fig == "Oval":
+            canvas.create_oval(values[0], values[1], values[2], values[3], dash=(4, 2))
         else: # fig == "Rabisco"
             canvas.create_line(values, dash=(4, 2))
 
@@ -73,7 +77,7 @@ label.grid(column=0, row=0, sticky=W, **paddings)
 
 tipo_figura_var = StringVar(root) 
 option_menu = ttk.OptionMenu(frame, tipo_figura_var,
-                             'Linha', 'Linha', 'Rabisco', 'Retângulo')
+                             'Linha', 'Linha', 'Rabisco', 'Retângulo', 'Oval')
 option_menu.grid(column=1, row=0, sticky=W, **paddings)
 
 canvas = Canvas(frame, bg='white', width=600, height=600)
