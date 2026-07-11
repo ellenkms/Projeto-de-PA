@@ -19,6 +19,15 @@ def atualizar_figura_nova(event):
     if tipo == "Rabisco":
         valores.append((event.x, event.y))
         figura_nova = (tipo, valores)
+        
+    elif tipo == "Círculo":
+        # NOVO: Lógica matemática para travar a largura e altura iguais (raio)
+        x1, y1 = valores[0], valores[1]
+        raio = max(abs(event.x - x1), abs(event.y - y1))
+        x2 = x1 + (raio if event.x > x1 else -raio)
+        y2 = y1 + (raio if event.y > y1 else -raio)
+        figura_nova = (tipo, (x1, y1, x2, y2))
+        
     else: 
         figura_nova = (tipo, (valores[0], valores[1], event.x, event.y))
         
@@ -38,7 +47,7 @@ def desenhar_figuras():
             canvas.create_line(values[0], values[1], values[2], values[3])
         elif fig == "Retângulo":
             canvas.create_rectangle(values[0], values[1], values[2], values[3])
-        elif fig == "Oval":
+        elif fig in ["Oval", "Círculo"]: # MODIFICADO: Círculo usa a mesma função da Oval
             canvas.create_oval(values[0], values[1], values[2], values[3])
         else: # fig == "Rabisco"
             canvas.create_line(values)
@@ -50,7 +59,7 @@ def desenhar_figura_nova():
             canvas.create_line(values[0], values[1], values[2], values[3], dash=(4, 2))
         elif fig == "Retângulo":
             canvas.create_rectangle(values[0], values[1], values[2], values[3], dash=(4, 2))
-        elif fig == "Oval":
+        elif fig in ["Oval", "Círculo"]: # MODIFICADO: Desenho tracejado do círculo
             canvas.create_oval(values[0], values[1], values[2], values[3], dash=(4, 2))
         else: # fig == "Rabisco"
             canvas.create_line(values, dash=(4, 2))
@@ -76,8 +85,9 @@ label = ttk.Label(frame,  text='Figura:')
 label.grid(column=0, row=0, sticky=W, **paddings)
 
 tipo_figura_var = StringVar(root) 
+# MODIFICADO: Adicionado 'Círculo' nas opções do menu
 option_menu = ttk.OptionMenu(frame, tipo_figura_var,
-                             'Linha', 'Linha', 'Rabisco', 'Retângulo', 'Oval')
+                             'Linha', 'Linha', 'Rabisco', 'Retângulo', 'Oval', 'Círculo')
 option_menu.grid(column=1, row=0, sticky=W, **paddings)
 
 canvas = Canvas(frame, bg='white', width=600, height=600)
