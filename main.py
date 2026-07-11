@@ -7,29 +7,28 @@ def iniciar_figura_nova(event):
     tipo = tipo_figura_var.get()
     
     if tipo == 'Rabisco':
-        figura_nova = (tipo, [(event.x, event.y)])
+        figura_nova = (tipo, [(event.x, event.y)], 'black', '')
     else: 
-        figura_nova = (tipo, (event.x, event.y, event.x, event.y))
+        figura_nova = (tipo, (event.x, event.y, event.x, event.y), 'black', '')
 
 # Quando mouse é movido com o botão pressionado
 def atualizar_figura_nova(event):
     global figura_nova
-    tipo, valores = figura_nova
+    tipo, valores, cor_borda, cor_preench = figura_nova
     
     if tipo == "Rabisco":
         valores.append((event.x, event.y))
-        figura_nova = (tipo, valores)
+        figura_nova = (tipo, valores, cor_borda, cor_preench)
         
     elif tipo == "Círculo":
-        # NOVO: Lógica matemática para travar a largura e altura iguais (raio)
         x1, y1 = valores[0], valores[1]
         raio = max(abs(event.x - x1), abs(event.y - y1))
         x2 = x1 + (raio if event.x > x1 else -raio)
         y2 = y1 + (raio if event.y > y1 else -raio)
-        figura_nova = (tipo, (x1, y1, x2, y2))
+        figura_nova = (tipo, (x1, y1, x2, y2), cor_borda, cor_preench)
         
     else: 
-        figura_nova = (tipo, (valores[0], valores[1], event.x, event.y))
+        figura_nova = (tipo, (valores[0], valores[1], event.x, event.y), cor_borda, cor_preench)
         
     desenhar_figuras()
     desenhar_figura_nova()
@@ -42,50 +41,47 @@ def incluir_figura_nova(event):
 
 def desenhar_figuras():
     canvas.delete("all")
-    for fig, values in figuras:
-        if fig == "Linha":
-            canvas.create_line(values[0], values[1], values[2], values[3])
-        elif fig == "Retângulo":
-            canvas.create_rectangle(values[0], values[1], values[2], values[3])
-        elif fig in ["Oval", "Círculo"]: # MODIFICADO: Círculo usa a mesma função da Oval
-            canvas.create_oval(values[0], values[1], values[2], values[3])
-        else: # fig == "Rabisco"
-            canvas.create_line(values)
+    for fig in figuras:
+        desenhar_forma(fig, finalizada=True)
 
 def desenhar_figura_nova():
     if figura_nova:
-        fig, values = figura_nova
-        if fig == "Linha":
-            canvas.create_line(values[0], values[1], values[2], values[3], dash=(4, 2))
-        elif fig == "Retângulo":
-            canvas.create_rectangle(values[0], values[1], values[2], values[3], dash=(4, 2))
-        elif fig in ["Oval", "Círculo"]: # MODIFICADO: Desenho tracejado do círculo
-            canvas.create_oval(values[0], values[1], values[2], values[3], dash=(4, 2))
-        else: # fig == "Rabisco"
-            canvas.create_line(values, dash=(4, 2))
+        desenhar_forma(figura_nova, finalizada=False)
+
+def desenhar_forma(figura, finalizada):
+    tipo, valores, cor_borda, cor_preench = figura
+    traco = () if finalizada else (4, 2)
+    
+    if tipo == "Linha":
+        canvas.create_line(*valores, fill=cor_borda, dash=traco)
+    elif tipo == "Rabisco":
+        canvas.create_line(valores, fill=cor_borda, dash=traco)
+    elif tipo == "Retângulo":
+        canvas.create_rectangle(*valores, outline=cor_borda, dash=traco)
+    elif tipo in ["Oval", "Círculo"]:
+        canvas.create_oval(*valores, outline=cor_borda, dash=traco)
 
 def incompleta(figura):
-    fig, values = figura
-    if fig == "Rabisco":
-        return len(values) <= 1
+    tipo, valores, _, _ = figura
+    if tipo == "Rabisco":
+        return len(valores) <= 1
     else: 
-        return (values[0], values[1]) == (values[2], values[3])
+        return (valores[0], valores[1]) == (valores[2], valores[3])
 
 #******* MAIN *******#
 
-figuras = []       # Todas as figuras desenhadas
-figura_nova = None # Figura que está sendo desenhada, mas ainda não foi incluída em figuras
+figuras = []       
+figura_nova = None 
 
 root = Tk()
 frame = Frame(root)
 
 paddings = {'padx': 5, 'pady': 5} 
 
-label = ttk.Label(frame,  text='Figura:')
+label = ttk.Label(frame, text='Figura:')
 label.grid(column=0, row=0, sticky=W, **paddings)
 
 tipo_figura_var = StringVar(root) 
-# MODIFICADO: Adicionado 'Círculo' nas opções do menu
 option_menu = ttk.OptionMenu(frame, tipo_figura_var,
                              'Linha', 'Linha', 'Rabisco', 'Retângulo', 'Oval', 'Círculo')
 option_menu.grid(column=1, row=0, sticky=W, **paddings)
