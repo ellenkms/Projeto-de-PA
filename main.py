@@ -1,16 +1,18 @@
 from tkinter import *
 from tkinter import ttk
 
-# Dicionário para traduzir as cores para o inglês
+# Dicionário para traduzir as cores do português para o inglês
 cores_pt_en = {
     'Preto': 'black',
     'Branco': 'white',
     'Vermelho': 'red',
     'Verde': 'green',
     'Azul': 'blue',
-    'Amarelo': 'yellow'
+    'Amarelo': 'yellow',
+    'Nenhum': '' # Essencial para figuras sem fundo
 }
-cores_opcoes = list(cores_pt_en.keys())
+cores_opcoes = ['Preto', 'Branco', 'Vermelho', 'Verde', 'Azul', 'Amarelo']
+cores_preench_opcoes = ['Nenhum'] + cores_opcoes
 
 # Quando mouse é pressionado
 def iniciar_figura_nova(event): 
@@ -59,7 +61,7 @@ def desenhar_figura_nova():
     if figura_nova:
         desenhar_forma(figura_nova, finalizada=False)
 
-def desenhar_forma(figura, finalizada): # desenha na tela
+def desenhar_forma(figura, finalizada):  # desenha na tela
     tipo, valores, cor_borda, cor_preench = figura
     traco = () if finalizada else (4, 2)
     
@@ -107,9 +109,16 @@ cor_borda_var = StringVar(root)
 menu_cor_borda = ttk.OptionMenu(frame, cor_borda_var, cores_opcoes[0], *cores_opcoes)
 menu_cor_borda.grid(column=3, row=0, sticky=W, **paddings)
 
+# --- Menu de Cor de Preenchimento ---
+label_cor_preench = ttk.Label(frame, text='Preenchimento:')
+label_cor_preench.grid(column=4, row=0, sticky=W, **paddings)
+
+cor_preench_var = StringVar(root)
+menu_cor_preench = ttk.OptionMenu(frame, cor_preench_var, cores_preench_opcoes[0], *cores_preench_opcoes)
+menu_cor_preench.grid(column=5, row=0, sticky=W, **paddings)
+
 # Área de desenho
 canvas = Canvas(frame, bg='white', width=600, height=600)
-# MODIFICADO: Aumentamos o columnspan de 2 para 6 para caber os novos menus sem amassar a tela
 canvas.grid(column=0, row=1, columnspan=6, sticky=W, **paddings)
 
 frame.pack()
