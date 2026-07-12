@@ -19,7 +19,6 @@ def iniciar_figura_nova(event):
     global figura_nova
     tipo = tipo_figura_var.get()
     
-    # Pega a cor do menu e traduz usando o dicionário
     cor_borda = cores_pt_en[cor_borda_var.get()]
     cor_preench = cores_pt_en[cor_preench_var.get()]
     
@@ -65,11 +64,10 @@ def desenhar_figura_nova():
     if figura_nova:
         desenhar_forma(figura_nova, finalizada=False)
 
-def desenhar_forma(figura, finalizada):  # desenha na tela
+def desenhar_forma(figura, finalizada):   # desenha na tela
     tipo, valores, cor_borda, cor_preench = figura
     traco = () if finalizada else (4, 2)
     
-    # Modificado: Adicionado o parâmetro 'fill=cor_preench' no Retângulo, Oval e Círculo
     if tipo == "Linha":
         canvas.create_line(*valores, fill=cor_borda, dash=traco)
     elif tipo == "Rabisco":
@@ -85,6 +83,12 @@ def incompleta(figura):
         return len(valores) <= 1
     else: 
         return (valores[0], valores[1]) == (valores[2], valores[3])
+
+# Função para limpar a tela
+def limpar_tela():
+    global figuras
+    figuras = []
+    desenhar_figuras()
 
 #******* MAIN *******#
 
@@ -107,7 +111,7 @@ option_menu = ttk.OptionMenu(frame, tipo_figura_var,
 option_menu.grid(column=1, row=0, sticky=W, **paddings)
 
 # --- Menu de Cor da Borda ---
-label_cor_borda = ttk.Label(frame, text='Cor da Borda:')
+label_cor_borda = ttk.Label(frame, text='Borda:')
 label_cor_borda.grid(column=2, row=0, sticky=W, **paddings)
 
 cor_borda_var = StringVar(root)
@@ -115,16 +119,20 @@ menu_cor_borda = ttk.OptionMenu(frame, cor_borda_var, cores_opcoes[0], *cores_op
 menu_cor_borda.grid(column=3, row=0, sticky=W, **paddings)
 
 # --- Menu de Cor de Preenchimento ---
-label_cor_preench = ttk.Label(frame, text='Preenchimento:')
+label_cor_preench = ttk.Label(frame, text='Fundo:')
 label_cor_preench.grid(column=4, row=0, sticky=W, **paddings)
 
 cor_preench_var = StringVar(root)
 menu_cor_preench = ttk.OptionMenu(frame, cor_preench_var, cores_preench_opcoes[0], *cores_preench_opcoes)
 menu_cor_preench.grid(column=5, row=0, sticky=W, **paddings)
 
+# --- Botão Limpar Tela ---
+btn_limpar = ttk.Button(frame, text="Limpar Tela", command=limpar_tela)
+btn_limpar.grid(column=6, row=0, sticky=W, **paddings)
+
 # Área de desenho
-canvas = Canvas(frame, bg='white', width=600, height=600)
-canvas.grid(column=0, row=1, columnspan=6, sticky=W, **paddings)
+canvas = Canvas(frame, bg='white', width=700, height=600)
+canvas.grid(column=0, row=1, columnspan=7, sticky=W, **paddings)
 
 frame.pack()
 
