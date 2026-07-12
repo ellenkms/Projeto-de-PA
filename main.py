@@ -1,6 +1,17 @@
 from tkinter import *
 from tkinter import ttk
 
+# Dicionário para traduzir as cores para o inglês
+cores_pt_en = {
+    'Preto': 'black',
+    'Branco': 'white',
+    'Vermelho': 'red',
+    'Verde': 'green',
+    'Azul': 'blue',
+    'Amarelo': 'yellow'
+}
+cores_opcoes = list(cores_pt_en.keys())
+
 # Quando mouse é pressionado
 def iniciar_figura_nova(event): 
     global figura_nova
@@ -8,7 +19,7 @@ def iniciar_figura_nova(event):
     
     if tipo == 'Rabisco':
         figura_nova = (tipo, [(event.x, event.y)], 'black', '')
-    else: 
+    else: # linha, retângulo, oval e círculo
         figura_nova = (tipo, (event.x, event.y, event.x, event.y), 'black', '')
 
 # Quando mouse é movido com o botão pressionado
@@ -27,7 +38,7 @@ def atualizar_figura_nova(event):
         y2 = y1 + (raio if event.y > y1 else -raio)
         figura_nova = (tipo, (x1, y1, x2, y2), cor_borda, cor_preench)
         
-    else: 
+    else: # linha, retângulo e oval
         figura_nova = (tipo, (valores[0], valores[1], event.x, event.y), cor_borda, cor_preench)
         
     desenhar_figuras()
@@ -35,7 +46,7 @@ def atualizar_figura_nova(event):
 
 # Quando mouse é solto
 def incluir_figura_nova(event): 
-    if not incompleta(figura_nova): 
+    if not incompleta(figura_nova): # verifica se a figura está completa
         figuras.append(figura_nova) 
     desenhar_figuras()
 
@@ -48,7 +59,7 @@ def desenhar_figura_nova():
     if figura_nova:
         desenhar_forma(figura_nova, finalizada=False)
 
-def desenhar_forma(figura, finalizada):
+def desenhar_forma(figura, finalizada): # desenha na tela
     tipo, valores, cor_borda, cor_preench = figura
     traco = () if finalizada else (4, 2)
     
@@ -74,10 +85,12 @@ figuras = []
 figura_nova = None 
 
 root = Tk()
+root.title("Artes e Rabiscos")
 frame = Frame(root)
 
 paddings = {'padx': 5, 'pady': 5} 
 
+# --- Menu de Figuras ---
 label = ttk.Label(frame, text='Figura:')
 label.grid(column=0, row=0, sticky=W, **paddings)
 
@@ -86,8 +99,18 @@ option_menu = ttk.OptionMenu(frame, tipo_figura_var,
                              'Linha', 'Linha', 'Rabisco', 'Retângulo', 'Oval', 'Círculo')
 option_menu.grid(column=1, row=0, sticky=W, **paddings)
 
+# --- Menu de Cor da Borda ---
+label_cor_borda = ttk.Label(frame, text='Cor da Borda:')
+label_cor_borda.grid(column=2, row=0, sticky=W, **paddings)
+
+cor_borda_var = StringVar(root)
+menu_cor_borda = ttk.OptionMenu(frame, cor_borda_var, cores_opcoes[0], *cores_opcoes)
+menu_cor_borda.grid(column=3, row=0, sticky=W, **paddings)
+
+# Área de desenho
 canvas = Canvas(frame, bg='white', width=600, height=600)
-canvas.grid(column=0, row=1, columnspan=2, sticky=W, **paddings)
+# MODIFICADO: Aumentamos o columnspan de 2 para 6 para caber os novos menus sem amassar a tela
+canvas.grid(column=0, row=1, columnspan=6, sticky=W, **paddings)
 
 frame.pack()
 
