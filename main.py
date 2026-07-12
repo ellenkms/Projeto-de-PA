@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-# Dicionário para traduzir as cores do português para o inglês
+# Dicionário para traduzir as cores para o inglês
 cores_pt_en = {
     'Preto': 'black',
     'Branco': 'white',
@@ -9,7 +9,7 @@ cores_pt_en = {
     'Verde': 'green',
     'Azul': 'blue',
     'Amarelo': 'yellow',
-    'Nenhum': '' # Essencial para figuras sem fundo
+    'Nenhum': '' 
 }
 cores_opcoes = ['Preto', 'Branco', 'Vermelho', 'Verde', 'Azul', 'Amarelo']
 cores_preench_opcoes = ['Nenhum'] + cores_opcoes
@@ -19,10 +19,14 @@ def iniciar_figura_nova(event):
     global figura_nova
     tipo = tipo_figura_var.get()
     
+    # Pega a cor do menu e traduz usando o dicionário
+    cor_borda = cores_pt_en[cor_borda_var.get()]
+    cor_preench = cores_pt_en[cor_preench_var.get()]
+    
     if tipo == 'Rabisco':
-        figura_nova = (tipo, [(event.x, event.y)], 'black', '')
+        figura_nova = (tipo, [(event.x, event.y)], cor_borda, cor_preench)
     else: # linha, retângulo, oval e círculo
-        figura_nova = (tipo, (event.x, event.y, event.x, event.y), 'black', '')
+        figura_nova = (tipo, (event.x, event.y, event.x, event.y), cor_borda, cor_preench)
 
 # Quando mouse é movido com o botão pressionado
 def atualizar_figura_nova(event):
@@ -48,7 +52,7 @@ def atualizar_figura_nova(event):
 
 # Quando mouse é solto
 def incluir_figura_nova(event): 
-    if not incompleta(figura_nova): # verifica se a figura está completa
+    if not incompleta(figura_nova):  # verifica se a figura está completa
         figuras.append(figura_nova) 
     desenhar_figuras()
 
@@ -65,14 +69,15 @@ def desenhar_forma(figura, finalizada):  # desenha na tela
     tipo, valores, cor_borda, cor_preench = figura
     traco = () if finalizada else (4, 2)
     
+    # Modificado: Adicionado o parâmetro 'fill=cor_preench' no Retângulo, Oval e Círculo
     if tipo == "Linha":
         canvas.create_line(*valores, fill=cor_borda, dash=traco)
     elif tipo == "Rabisco":
         canvas.create_line(valores, fill=cor_borda, dash=traco)
     elif tipo == "Retângulo":
-        canvas.create_rectangle(*valores, outline=cor_borda, dash=traco)
+        canvas.create_rectangle(*valores, outline=cor_borda, fill=cor_preench, dash=traco)
     elif tipo in ["Oval", "Círculo"]:
-        canvas.create_oval(*valores, outline=cor_borda, dash=traco)
+        canvas.create_oval(*valores, outline=cor_borda, fill=cor_preench, dash=traco)
 
 def incompleta(figura):
     tipo, valores, _, _ = figura
