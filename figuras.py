@@ -99,24 +99,34 @@ class Rabisco(Figura): # herda da classe Figura
     def incompleta(self):
         return len(self.pontos) <= 1 # se houver menos de dois pontos o Rabisco está incompleto
 
-class Poligono(Figura): # herda da classe Figura
-
+class Poligono(Figura):
     def __init__(self, x, y, cor_borda, cor_preench):
-        super().__init__(cor_borda, cor_preench)  # chama o construtor de Figura
-        # Começa com dois vértices: o inicial fixo e o segundo que vai se mover
-        self.vertices = [(x, y), (x, y)] 
+        super().__init__(cor_borda, cor_preench)
+        # Começa com dois vértices no mesmo lugar (o ponto inicial e a guia móvel)
+        self.vertices = [(x, y), (x, y)]
 
     def atualizar(self, event):
-        # CORREÇÃO: Em vez de adicionar pontos novos, atualiza apenas o ÚLTIMO ponto
-        # Isso faz o polígono seguir o mouse sem criar milhares de vértices
+        # A guia móvel segue o mouse sem fixar o ponto
         self.vertices[-1] = (event.x, event.y)
-    
+
+    def adicionar_ponto(self, x, y):
+        # Fixa o ponto clicado e cria uma nova guia móvel
+        self.vertices[-1] = (x, y)
+        self.vertices.append((x, y))
+
+    def finalizar_forma(self):
+        # Remove a guia móvel para o desenho fechar bonitinho no último clique
+        if len(self.vertices) > 1:
+            self.vertices.pop()
+
     def desenhar(self, canvas, finalizada):
-        # O Tkinter precisa de pelo menos 2 pontos para desenhar a linha prévia,
-        # e o polígono final só se fecha se tiver 3 ou mais.
-        if len(self.vertices) >= 2:
-            canvas.create_polygon(self.vertices, outline=self.cor_borda, fill=self.cor_preench, dash=self.traco(finalizada))
+        if len(self.vertices) >= 3:
+            if finalizada:
+                canvas.create_polygon(self.vertices, outline=self.cor_borda, fill=self.cor_preench)
+            else:
+                canvas.create_polygon(self.vertices, outline=self.cor_borda, fill="", dash=self.traco(finalizada))
+        elif len(self.vertices) == 2:
+            canvas.create_line(self.vertices[0], self.vertices[1], fill=self.cor_borda, dash=self.traco(finalizada))
 
     def incompleta(self):
-        # O Polígono precisa de pelo menos 3 vértices para não ser considerado incompleto
         return len(self.vertices) < 3
