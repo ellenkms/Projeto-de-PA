@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import ttk
+# [MUDANÇA 1] Importando as classes do arquivo da Ellen
+from figuras import Linha, Retangulo, Oval, Circulo, Rabisco, Poligono
 
 # Dicionário para traduzir as cores para o inglês
 cores_pt_en = {
@@ -14,7 +16,7 @@ cores_pt_en = {
 cores_opcoes = ['Preto', 'Branco', 'Vermelho', 'Verde', 'Azul', 'Amarelo']
 cores_preench_opcoes = ['Nenhum'] + cores_opcoes
 
-# Quando mouse é pressionado
+# Quando mouse é pressionado (Mantido original)
 def iniciar_figura_nova(event): 
     global figura_nova
     tipo = tipo_figura_var.get()
@@ -24,10 +26,10 @@ def iniciar_figura_nova(event):
     
     if tipo == 'Rabisco':
         figura_nova = (tipo, [(event.x, event.y)], cor_borda, cor_preench)
-    else: # linha, retângulo, oval e círculo
+    else: 
         figura_nova = (tipo, (event.x, event.y, event.x, event.y), cor_borda, cor_preench)
 
-# Quando mouse é movido com o botão pressionado
+# Quando mouse é movido com o botão pressionado (Mantido original)
 def atualizar_figura_nova(event):
     global figura_nova
     tipo, valores, cor_borda, cor_preench = figura_nova
@@ -43,28 +45,35 @@ def atualizar_figura_nova(event):
         y2 = y1 + (raio if event.y > y1 else -raio)
         figura_nova = (tipo, (x1, y1, x2, y2), cor_borda, cor_preench)
         
-    else: # linha, retângulo e oval
+    else: 
         figura_nova = (tipo, (valores[0], valores[1], event.x, event.y), cor_borda, cor_preench)
         
     desenhar_figuras()
     desenhar_figura_nova()
 
-# Quando mouse é solto
+# Quando mouse é solto (Mantido original)
 def incluir_figura_nova(event): 
-    if not incompleta(figura_nova):  # verifica se a figura está completa
+    if not incompleta(figura_nova): 
         figuras.append(figura_nova) 
     desenhar_figuras()
 
+# [MUDANÇA 2] Adaptando as funções de desenho para aceitarem a nova Orientação a Objetos
 def desenhar_figuras():
     canvas.delete("all")
     for fig in figuras:
-        desenhar_forma(fig, finalizada=True)
+        if hasattr(fig, 'desenhar'): # Se for da classe da Ellen
+            fig.desenhar(canvas, finalizada=True)
+        else: # Se for do modo antigo
+            desenhar_forma(fig, finalizada=True)
 
 def desenhar_figura_nova():
     if figura_nova:
-        desenhar_forma(figura_nova, finalizada=False)
+        if hasattr(figura_nova, 'desenhar'):
+            figura_nova.desenhar(canvas, finalizada=False)
+        else:
+            desenhar_forma(figura_nova, finalizada=False)
 
-def desenhar_forma(figura, finalizada):   # desenha na tela
+def desenhar_forma(figura, finalizada):  
     tipo, valores, cor_borda, cor_preench = figura
     traco = () if finalizada else (4, 2)
     
@@ -84,13 +93,12 @@ def incompleta(figura):
     else: 
         return (valores[0], valores[1]) == (valores[2], valores[3])
 
-# Função para limpar a tela
 def limpar_tela():
     global figuras
     figuras = []
     desenhar_figuras()
 
-#******* MAIN *******#
+#******* MAIN *******# (Mantido original)
 
 figuras = []       
 figura_nova = None 
@@ -101,7 +109,6 @@ frame = Frame(root)
 
 paddings = {'padx': 5, 'pady': 5} 
 
-# --- Menu de Figuras ---
 label = ttk.Label(frame, text='Figura:')
 label.grid(column=0, row=0, sticky=W, **paddings)
 
@@ -110,7 +117,6 @@ option_menu = ttk.OptionMenu(frame, tipo_figura_var,
                              'Linha', 'Linha', 'Rabisco', 'Retângulo', 'Oval', 'Círculo')
 option_menu.grid(column=1, row=0, sticky=W, **paddings)
 
-# --- Menu de Cor da Borda ---
 label_cor_borda = ttk.Label(frame, text='Borda:')
 label_cor_borda.grid(column=2, row=0, sticky=W, **paddings)
 
@@ -118,7 +124,6 @@ cor_borda_var = StringVar(root)
 menu_cor_borda = ttk.OptionMenu(frame, cor_borda_var, cores_opcoes[0], *cores_opcoes)
 menu_cor_borda.grid(column=3, row=0, sticky=W, **paddings)
 
-# --- Menu de Cor de Preenchimento ---
 label_cor_preench = ttk.Label(frame, text='Fundo:')
 label_cor_preench.grid(column=4, row=0, sticky=W, **paddings)
 
@@ -126,11 +131,9 @@ cor_preench_var = StringVar(root)
 menu_cor_preench = ttk.OptionMenu(frame, cor_preench_var, cores_preench_opcoes[0], *cores_preench_opcoes)
 menu_cor_preench.grid(column=5, row=0, sticky=W, **paddings)
 
-# --- Botão Limpar Tela ---
 btn_limpar = ttk.Button(frame, text="Limpar Tela", command=limpar_tela)
 btn_limpar.grid(column=6, row=0, sticky=W, **paddings)
 
-# Área de desenho
 canvas = Canvas(frame, bg='white', width=700, height=600)
 canvas.grid(column=0, row=1, columnspan=7, sticky=W, **paddings)
 
