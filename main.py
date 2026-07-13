@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import ttk
-# [MUDANÇA 1] Importando as classes do arquivo da Ellen
 from figuras import Linha, Retangulo, Oval, Circulo, Rabisco, Poligono
 
 # Dicionário para traduzir as cores para o inglês
@@ -24,7 +23,7 @@ def iniciar_figura_nova(event):
     cor_borda = cores_pt_en[cor_borda_var.get()]
     cor_preench = cores_pt_en[cor_preench_var.get()]
     
-    # [MUDANÇA COMMIT 3] Agora todas as formas usam as classes da Ellen
+    # Todas as formas usam as classes
     if tipo == 'Linha':
         figura_nova = Linha(event.x, event.y, cor_borda, cor_preench)
     elif tipo == 'Retângulo':
@@ -35,12 +34,13 @@ def iniciar_figura_nova(event):
         figura_nova = Circulo(event.x, event.y, cor_borda, cor_preench)
     elif tipo == 'Rabisco':
         figura_nova = Rabisco(event.x, event.y, cor_borda, cor_preench)
+    elif tipo == 'Polígono':
+        figura_nova = Poligono(event.x, event.y, cor_borda, cor_preench)
 
 # Quando mouse é movido com o botão pressionado
 def atualizar_figura_nova(event):
     global figura_nova
     if figura_nova:
-        # [MUDANÇA COMMIT 3] Código 100% OO: qualquer objeto se atualiza sozinho
         figura_nova.atualizar(event)
         desenhar_figuras()
         desenhar_figura_nova()
@@ -49,7 +49,6 @@ def atualizar_figura_nova(event):
 def incluir_figura_nova(event): 
     global figura_nova
     if figura_nova:
-        # [MUDANÇA COMMIT 3] Checa se está incompleto do jeito OO
         if not figura_nova.incompleta(): 
             figuras.append(figura_nova) 
         desenhar_figuras()
@@ -57,21 +56,18 @@ def incluir_figura_nova(event):
 def desenhar_figuras():
     canvas.delete("all")
     for fig in figuras:
-        # Desenha a figura usando o metodo da classe
         fig.desenhar(canvas, finalizada=True)
 
 def desenhar_figura_nova():
     if figura_nova:
-        # Desenha a figura nova usando o metodo da classe
         figura_nova.desenhar(canvas, finalizada=False)
-
 
 def limpar_tela():
     global figuras
     figuras = []
     desenhar_figuras()
 
-#******* MAIN *******# (Mantido original)
+#******* MAIN *******#
 
 figuras = []       
 figura_nova = None 
@@ -85,9 +81,10 @@ paddings = {'padx': 5, 'pady': 5}
 label = ttk.Label(frame, text='Figura:')
 label.grid(column=0, row=0, sticky=W, **paddings)
 
+# Polígono adicionado ao menu de opções
 tipo_figura_var = StringVar(root) 
 option_menu = ttk.OptionMenu(frame, tipo_figura_var,
-                             'Linha', 'Linha', 'Rabisco', 'Retângulo', 'Oval', 'Círculo')
+                             'Linha', 'Linha', 'Rabisco', 'Retângulo', 'Oval', 'Círculo', 'Polígono')
 option_menu.grid(column=1, row=0, sticky=W, **paddings)
 
 label_cor_borda = ttk.Label(frame, text='Borda:')
