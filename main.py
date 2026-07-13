@@ -24,38 +24,24 @@ def iniciar_figura_nova(event):
     cor_borda = cores_pt_en[cor_borda_var.get()]
     cor_preench = cores_pt_en[cor_preench_var.get()]
     
-    # [MUDANÇA COMMIT 2] Criando objetos para as 3 primeiras formas
+    # [MUDANÇA COMMIT 3] Agora todas as formas usam as classes da Ellen
     if tipo == 'Linha':
         figura_nova = Linha(event.x, event.y, cor_borda, cor_preench)
     elif tipo == 'Retângulo':
         figura_nova = Retangulo(event.x, event.y, cor_borda, cor_preench)
     elif tipo == 'Oval':
         figura_nova = Oval(event.x, event.y, cor_borda, cor_preench)
+    elif tipo == 'Círculo':
+        figura_nova = Circulo(event.x, event.y, cor_borda, cor_preench)
     elif tipo == 'Rabisco':
-        figura_nova = (tipo, [(event.x, event.y)], cor_borda, cor_preench)
-    else: # Círculo continua antigo por enquanto
-        figura_nova = (tipo, (event.x, event.y, event.x, event.y), cor_borda, cor_preench)
+        figura_nova = Rabisco(event.x, event.y, cor_borda, cor_preench)
 
 # Quando mouse é movido com o botão pressionado
 def atualizar_figura_nova(event):
     global figura_nova
     if figura_nova:
-        # [MUDANÇA COMMIT 2] Se for um objeto OO, ele se atualiza sozinho
-        if hasattr(figura_nova, 'atualizar'):
-            figura_nova.atualizar(event)
-        else:
-            # Lógica antiga para as formas que ainda não migramos
-            tipo, valores, cor_borda, cor_preench = figura_nova
-            if tipo == "Rabisco":
-                valores.append((event.x, event.y))
-                figura_nova = (tipo, valores, cor_borda, cor_preench)
-            elif tipo == "Círculo":
-                x1, y1 = valores[0], valores[1]
-                raio = max(abs(event.x - x1), abs(event.y - y1))
-                x2 = x1 + (raio if event.x > x1 else -raio)
-                y2 = y1 + (raio if event.y > y1 else -raio)
-                figura_nova = (tipo, (x1, y1, x2, y2), cor_borda, cor_preench)
-        
+        # [MUDANÇA COMMIT 3] Código 100% OO: qualquer objeto se atualiza sozinho
+        figura_nova.atualizar(event)
         desenhar_figuras()
         desenhar_figura_nova()
 
@@ -63,49 +49,22 @@ def atualizar_figura_nova(event):
 def incluir_figura_nova(event): 
     global figura_nova
     if figura_nova:
-        if hasattr(figura_nova, 'incompleta'):
-            if not figura_nova.incompleta(): 
-                figuras.append(figura_nova) 
-        else:
-            if not incompleta(figura_nova): 
-                figuras.append(figura_nova) 
+        # [MUDANÇA COMMIT 3] Checa se está incompleto do jeito OO
+        if not figura_nova.incompleta(): 
+            figuras.append(figura_nova) 
         desenhar_figuras()
 
-# [MUDANÇA 2] Adaptando as funções de desenho para aceitarem a nova Orientação a Objetos
 def desenhar_figuras():
     canvas.delete("all")
     for fig in figuras:
-        if hasattr(fig, 'desenhar'): # Se for da classe da Ellen
-            fig.desenhar(canvas, finalizada=True)
-        else: # Se for do modo antigo
-            desenhar_forma(fig, finalizada=True)
+        # Desenha a figura usando o metodo da classe
+        fig.desenhar(canvas, finalizada=True)
 
 def desenhar_figura_nova():
     if figura_nova:
-        if hasattr(figura_nova, 'desenhar'):
-            figura_nova.desenhar(canvas, finalizada=False)
-        else:
-            desenhar_forma(figura_nova, finalizada=False)
+        # Desenha a figura nova usando o metodo da classe
+        figura_nova.desenhar(canvas, finalizada=False)
 
-def desenhar_forma(figura, finalizada):  
-    tipo, valores, cor_borda, cor_preench = figura
-    traco = () if finalizada else (4, 2)
-    
-    if tipo == "Linha":
-        canvas.create_line(*valores, fill=cor_borda, dash=traco)
-    elif tipo == "Rabisco":
-        canvas.create_line(valores, fill=cor_borda, dash=traco)
-    elif tipo == "Retângulo":
-        canvas.create_rectangle(*valores, outline=cor_borda, fill=cor_preench, dash=traco)
-    elif tipo in ["Oval", "Círculo"]:
-        canvas.create_oval(*valores, outline=cor_borda, fill=cor_preench, dash=traco)
-
-def incompleta(figura):
-    tipo, valores, _, _ = figura
-    if tipo == "Rabisco":
-        return len(valores) <= 1
-    else: 
-        return (valores[0], valores[1]) == (valores[2], valores[3])
 
 def limpar_tela():
     global figuras
