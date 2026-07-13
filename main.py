@@ -16,7 +16,7 @@ cores_pt_en = {
 cores_opcoes = ['Preto', 'Branco', 'Vermelho', 'Verde', 'Azul', 'Amarelo']
 cores_preench_opcoes = ['Nenhum'] + cores_opcoes
 
-# Quando mouse é pressionado (Mantido original)
+# Quando mouse é pressionado
 def iniciar_figura_nova(event): 
     global figura_nova
     tipo = tipo_figura_var.get()
@@ -24,38 +24,52 @@ def iniciar_figura_nova(event):
     cor_borda = cores_pt_en[cor_borda_var.get()]
     cor_preench = cores_pt_en[cor_preench_var.get()]
     
-    if tipo == 'Rabisco':
+    # [MUDANÇA COMMIT 2] Criando objetos para as 3 primeiras formas
+    if tipo == 'Linha':
+        figura_nova = Linha(event.x, event.y, cor_borda, cor_preench)
+    elif tipo == 'Retângulo':
+        figura_nova = Retangulo(event.x, event.y, cor_borda, cor_preench)
+    elif tipo == 'Oval':
+        figura_nova = Oval(event.x, event.y, cor_borda, cor_preench)
+    elif tipo == 'Rabisco':
         figura_nova = (tipo, [(event.x, event.y)], cor_borda, cor_preench)
-    else: 
+    else: # Círculo continua antigo por enquanto
         figura_nova = (tipo, (event.x, event.y, event.x, event.y), cor_borda, cor_preench)
 
-# Quando mouse é movido com o botão pressionado (Mantido original)
+# Quando mouse é movido com o botão pressionado
 def atualizar_figura_nova(event):
     global figura_nova
-    tipo, valores, cor_borda, cor_preench = figura_nova
-    
-    if tipo == "Rabisco":
-        valores.append((event.x, event.y))
-        figura_nova = (tipo, valores, cor_borda, cor_preench)
+    if figura_nova:
+        # [MUDANÇA COMMIT 2] Se for um objeto OO, ele se atualiza sozinho
+        if hasattr(figura_nova, 'atualizar'):
+            figura_nova.atualizar(event)
+        else:
+            # Lógica antiga para as formas que ainda não migramos
+            tipo, valores, cor_borda, cor_preench = figura_nova
+            if tipo == "Rabisco":
+                valores.append((event.x, event.y))
+                figura_nova = (tipo, valores, cor_borda, cor_preench)
+            elif tipo == "Círculo":
+                x1, y1 = valores[0], valores[1]
+                raio = max(abs(event.x - x1), abs(event.y - y1))
+                x2 = x1 + (raio if event.x > x1 else -raio)
+                y2 = y1 + (raio if event.y > y1 else -raio)
+                figura_nova = (tipo, (x1, y1, x2, y2), cor_borda, cor_preench)
         
-    elif tipo == "Círculo":
-        x1, y1 = valores[0], valores[1]
-        raio = max(abs(event.x - x1), abs(event.y - y1))
-        x2 = x1 + (raio if event.x > x1 else -raio)
-        y2 = y1 + (raio if event.y > y1 else -raio)
-        figura_nova = (tipo, (x1, y1, x2, y2), cor_borda, cor_preench)
-        
-    else: 
-        figura_nova = (tipo, (valores[0], valores[1], event.x, event.y), cor_borda, cor_preench)
-        
-    desenhar_figuras()
-    desenhar_figura_nova()
+        desenhar_figuras()
+        desenhar_figura_nova()
 
-# Quando mouse é solto (Mantido original)
+# Quando mouse é solto
 def incluir_figura_nova(event): 
-    if not incompleta(figura_nova): 
-        figuras.append(figura_nova) 
-    desenhar_figuras()
+    global figura_nova
+    if figura_nova:
+        if hasattr(figura_nova, 'incompleta'):
+            if not figura_nova.incompleta(): 
+                figuras.append(figura_nova) 
+        else:
+            if not incompleta(figura_nova): 
+                figuras.append(figura_nova) 
+        desenhar_figuras()
 
 # [MUDANÇA 2] Adaptando as funções de desenho para aceitarem a nova Orientação a Objetos
 def desenhar_figuras():
