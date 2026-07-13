@@ -103,18 +103,20 @@ class Poligono(Figura): # herda da classe Figura
 
     def __init__(self, x, y, cor_borda, cor_preench):
         super().__init__(cor_borda, cor_preench)  # chama o construtor de Figura
-        # Começa com dois pontos: o inicial fixo e o segundo que vai se mover com o mouse
+        # Começa com dois vértices: o inicial fixo e o segundo que vai se mover
         self.vertices = [(x, y), (x, y)] 
 
     def atualizar(self, event):
-        # Em vez de adicionar pontos infinitos, atualiza apenas o ÚLTIMO ponto com o movimento do mouse
+        # CORREÇÃO: Em vez de adicionar pontos novos, atualiza apenas o ÚLTIMO ponto
+        # Isso faz o polígono seguir o mouse sem criar milhares de vértices
         self.vertices[-1] = (event.x, event.y)
     
     def desenhar(self, canvas, finalizada):
-        # O Tkinter precisa de pelo menos 3 pontos (6 coordenadas) para desenhar um polígono na tela
+        # O Tkinter precisa de pelo menos 2 pontos para desenhar a linha prévia,
+        # e o polígono final só se fecha se tiver 3 ou mais.
         if len(self.vertices) >= 2:
             canvas.create_polygon(self.vertices, outline=self.cor_borda, fill=self.cor_preench, dash=self.traco(finalizada))
 
     def incompleta(self):
-        # Um polígono precisa de pelo menos 3 vértices distintos para existir
+        # O Polígono precisa de pelo menos 3 vértices para não ser considerado incompleto
         return len(self.vertices) < 3
