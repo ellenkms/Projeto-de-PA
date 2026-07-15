@@ -1,13 +1,10 @@
 class Desenho:
 
     def __init__(self):
-        self.figuras = []  
+        self.figuras = []  # armazena todas as figuras do desenho
     
     def adicionar(self, figura):
-        self.figuras.append(figura)
+        self.figuras.append(figura) # adiciona uma figura à lista
     
     def limpar(self):
-        self.figuras.clear()
-
-    def remover(self, figura):
-        self.figuras.remove(figura)
+        self.figuras.clear() # remove todas as figuras da lista
