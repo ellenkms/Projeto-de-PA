@@ -1,0 +1,6 @@
+# Arquivos compilados do Python
+__pycache__/
+*.py[cod]
+
+# Configurações do VS Code
+.vscode/
