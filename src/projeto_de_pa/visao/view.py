@@ -135,7 +135,7 @@ class View:
         self.controller.mover_mouse(event.x, event.y)
 
     def capturar_soltura(self, event):
-        self.controller.soltar_mouse()
+        self.controller.soltar_mouse(event.x, event.y)
 
     def capturar_duplo_clique(self, event):
         self.controller.finalizar_poligono()
